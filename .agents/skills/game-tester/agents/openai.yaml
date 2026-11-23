@@ -1,0 +1,4 @@
+interface:
+  display_name: "Game Tester"
+  short_description: "Check browser games without changing their code"
+  default_prompt: "Use $game-tester to test this browser game and report any gameplay problems."
