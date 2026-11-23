@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf6ef">
+  <title>Mich's Cookie Shop Tycoon</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #30251f;
+      --muted: #84776d;
+      --paper: #faf6ef;
+      --card: #fffdf9;
+      --line: #eee5d9;
+      --brown: #704431;
+      --brown-dark: #543323;
+      --orange: #e5a55d;
+      --green: #47745a;
+      --red: #ad5143;
+      --shadow: 0 10px 32px rgba(75, 48, 29, .07);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #d9a66c; outline-offset: 3px; }
+    .shell { max-width: 1040px; padding: 34px 24px 52px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; background: #f0dfc8; font-size: 25px; }
+    .eyebrow { margin: 0 0 3px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(22px, 4vw, 30px); letter-spacing: -.035em; }
+    .day-pill { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 10px 15px; color: var(--brown); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .progress-track { height: 5px; margin: 0 0 24px; overflow: hidden; border-radius: 99px; background: #eadfD2; }
+    .progress-fill { height: 100%; width: 0; border-radius: inherit; background: var(--orange); transition: width .35s ease; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .metric, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 17px; box-shadow: var(--shadow); }
+    .metric { padding: 17px 20px; }
+    .metric-label { color: var(--muted); font-size: 12px; font-weight: 650; }
+    .metric-value { margin-top: 7px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; letter-spacing: -.04em; }
+    .metric-note { margin-top: 3px; color: #9a8e83; font-size: 11px; }
+    .main-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 18px; align-items: start; }
+    .panel { padding: 23px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 20px; }
+    h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 21px; letter-spacing: -.025em; }
+    .sub { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .shop-scene { position: relative; height: 148px; margin: -2px 0 19px; overflow: hidden; isolation: isolate; border: 1px solid #eadfce; border-radius: 14px; background: linear-gradient(#f8e9d3 0 72%, #ead9c2 72%); }
+    .scene-sun { position: absolute; top: 16px; right: 24px; width: 27px; height: 27px; border-radius: 50%; background: #f1c575; box-shadow: 0 0 0 7px #f1c57530; }
+    .scene-cloud { position: absolute; top: 21px; left: 15%; color: #fffaf2; font-size: 23px; opacity: .9; }
+    .storefront { position: absolute; z-index: 1; left: 50%; bottom: 20px; width: 180px; height: 88px; transform: translateX(-50%); border: 2px solid #8c6145; border-radius: 8px 8px 2px 2px; background: #f7d9b0; box-shadow: 0 4px 0 #8c6145; }
+    .shop-sign { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); padding: 4px 12px; border: 2px solid #8c6145; border-radius: 8px; background: #fffaf1; color: var(--brown); font-family: Georgia, serif; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .shop-awning { position: absolute; top: 12px; left: 0; right: 0; height: 17px; border: 1px solid #bd8054; background: repeating-linear-gradient(90deg, #d88365 0 18px, #fff5e9 18px 36px); }
+    .shop-window { position: absolute; top: 36px; left: 11px; width: 58px; height: 39px; border: 3px solid #9c704f; border-radius: 3px; background: linear-gradient(#bfe1e1 0 65%, #fff9e9 65%); }
+    .shop-window::after { content: '🍪  🍪'; position: absolute; inset: 17px 0 0; color: #805038; font-size: 9px; text-align: center; }
+    .shop-door { position: absolute; right: 15px; bottom: 0; width: 37px; height: 50px; border: 3px solid #8c6145; border-bottom: 0; border-radius: 12px 12px 0 0; background: #a9c8b5; }
+    .shop-door::after { content: ''; position: absolute; top: 24px; right: 4px; width: 4px; height: 4px; border-radius: 50%; background: #704431; }
+    .scene-ground { position: absolute; z-index: 2; right: 0; bottom: 19px; left: 0; height: 2px; background: #c4a98b; }
+    .scene-caption { position: absolute; z-index: 4; top: 9px; left: 12px; max-width: calc(100% - 58px); padding: 5px 9px; border: 1px solid #f0e3d0; border-radius: 99px; background: #fffdf9e8; color: #746052; font-size: 10px; font-weight: 700; }
+    .customer { position: absolute; z-index: 3; bottom: 15px; left: -35px; width: 32px; height: 40px; font-size: 29px; line-height: 40px; filter: drop-shadow(0 2px 0 #826c5630); opacity: 0; }
+    .customer-arriving { animation: visit-shop 2.65s cubic-bezier(.35,.02,.45,1) both; }
+    .customer.arrival-1 { animation-delay: .1s; } .customer.arrival-2 { animation-delay: .48s; }
+    .customer.arrival-3 { animation-delay: .86s; } .customer.arrival-4 { animation-delay: 1.24s; }
+    .customer.arrival-5 { animation-delay: 1.62s; } .customer.arrival-6 { animation-delay: 2s; }
+    .customer.arrival-7 { animation-delay: 2.38s; } .customer.arrival-8 { animation-delay: 2.76s; }
+    @keyframes visit-shop { 0% { left: -35px; opacity: 0; transform: translateY(0) scale(.9); } 12% { opacity: 1; } 32% { left: calc(50% - 108px); transform: translateY(-4px) scale(1); } 43% { left: calc(50% - 108px); transform: translateY(0) scale(1); } 52% { left: calc(50% - 108px); transform: translateY(-5px) scale(1.1); } 66% { left: calc(50% - 108px); transform: translateY(0) scale(1); } 100% { left: calc(100% + 35px); opacity: 0; transform: translateY(0) scale(.92); } }
+    .cookie-pop { position: absolute; z-index: 4; bottom: 72px; left: calc(50% - 91px); font-size: 17px; opacity: 0; }
+    .cookie-pop.playing { animation: cookie-handoff 2.65s ease both; }
+    .cookie-pop.arrival-1 { animation-delay: .1s; } .cookie-pop.arrival-2 { animation-delay: .48s; }
+    .cookie-pop.arrival-3 { animation-delay: .86s; } .cookie-pop.arrival-4 { animation-delay: 1.24s; }
+    .cookie-pop.arrival-5 { animation-delay: 1.62s; } .cookie-pop.arrival-6 { animation-delay: 2s; }
+    .cookie-pop.arrival-7 { animation-delay: 2.38s; } .cookie-pop.arrival-8 { animation-delay: 2.76s; }
+    @keyframes cookie-handoff { 0%, 38% { opacity: 0; transform: translateY(8px) scale(.7); } 49% { opacity: 1; transform: translateY(-4px) scale(1.1); } 60% { opacity: 1; transform: translateY(-10px) scale(1); } 70%, 100% { opacity: 0; transform: translateY(-16px) scale(.8); } }
+    .customer-badge { position: absolute; top: -3px; right: -8px; z-index: 5; display: grid; min-width: 16px; height: 16px; place-items: center; padding: 0 3px; border-radius: 99px; background: #fffdf9; color: var(--brown); box-shadow: 0 1px 4px #54332333; font-size: 8px; font-weight: 800; }
+    @media (prefers-reduced-motion: reduce) { .customer-arriving, .cookie-pop.playing { animation: none !important; opacity: 0; } }
+    .section-label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 20px 0 9px; font-size: 13px; font-weight: 700; }
+    .section-label:first-of-type { margin-top: 0; }
+    .hint { color: var(--muted); font-size: 11px; font-weight: 500; }
+    .variety-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .variety-option { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--ink); text-align: left; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+    .variety-option:hover { transform: translateY(-1px); border-color: #d8b48c; }
+    .variety-option[aria-pressed="true"] { border-color: var(--brown); background: #f8f1e7; box-shadow: inset 0 0 0 1px var(--brown); }
+    .variety-icon { font-size: 23px; line-height: 1; }
+    .variety-copy { display: grid; gap: 3px; min-width: 0; }
+    .variety-name { font-size: 11px; font-weight: 750; }
+    .variety-economics { color: var(--muted); font-size: 10px; white-space: nowrap; }
+    @media (max-width: 440px) { .variety-grid { gap: 6px; } .variety-option { gap: 7px; padding: 8px 7px; } .variety-icon { font-size: 19px; } .variety-name { font-size: 10px; } .variety-economics { font-size: 9px; } }
+    .input-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+    input[type="range"] { width: 100%; accent-color: var(--brown); cursor: pointer; }
+    .number-wrap { display: flex; align-items: center; gap: 6px; min-width: 112px; justify-content: flex-end; }
+    .number-wrap input { width: 78px; border: 1px solid var(--line); border-radius: 9px; padding: 8px 9px; color: var(--ink); background: #fff; text-align: right; }
+    .unit { color: var(--muted); font-size: 12px; }
+    .range-ends { display: flex; justify-content: space-between; color: #9b8d81; font-size: 10px; margin-top: 2px; }
+    .cost-box { display: grid; gap: 9px; margin-top: 20px; padding: 14px; border-radius: 12px; background: #f8f2e9; }
+    .cost-row { display: flex; justify-content: space-between; gap: 10px; color: #716358; font-size: 12px; }
+    .cost-row strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .cost-row.total { border-top: 1px solid #e9ddcd; padding-top: 9px; color: var(--ink); font-weight: 750; }
+    .cost-row.total strong { color: var(--brown); }
+    .notice { min-height: 18px; margin: 12px 0 0; color: var(--red); font-size: 12px; }
+    .primary { display: flex; width: 100%; justify-content: center; align-items: center; gap: 9px; margin-top: 8px; border: 0; border-radius: 11px; padding: 13px 16px; background: var(--brown); color: white; font-weight: 750; cursor: pointer; transition: background .18s, transform .18s; }
+    .primary:hover { background: var(--brown-dark); transform: translateY(-1px); }
+    .primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .market-card { padding: 14px; background: #fcf8f1; border: 1px solid var(--line); border-radius: 12px; }
+    .market-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 750; }
+    .market-dot { width: 8px; height: 8px; border-radius: 50%; background: #75a77a; box-shadow: 0 0 0 3px #e5f0e4; }
+    .market-copy { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .results { display: none; margin-top: 15px; padding: 15px; border-radius: 12px; background: #f4f0e8; }
+    .results.show { display: block; animation: rise .28s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .results h3 { margin: 0 0 11px; font-family: Georgia, serif; font-size: 16px; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+    .result-item span { display: block; color: var(--muted); font-size: 10px; }
+    .result-item strong { display: block; margin-top: 3px; font-size: 14px; font-variant-numeric: tabular-nums; }
+    .positive { color: var(--green); } .negative { color: var(--red); }
+    .log-panel { margin-top: 18px; padding: 19px 22px; }
+    .log-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 11px; }
+    .log-head h2 { font-size: 18px; }
+    .log-scroll { max-height: 208px; overflow-y: auto; }
+    .log-empty { padding: 14px 0 3px; color: #978b80; font-size: 12px; }
+    .log-row { display: grid; grid-template-columns: 65px 1fr 95px 95px; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid #f1ebe3; font-size: 12px; }
+    .log-day { color: var(--muted); font-weight: 650; }
+    .log-detail { color: #70645a; }
+    .log-money { text-align: right; font-variant-numeric: tabular-nums; }
+    .log-profit { text-align: right; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .ending { display: none; margin-top: 18px; padding: 24px; border: 1px solid #eadcc8; border-radius: 17px; background: #fffaf1; text-align: center; box-shadow: var(--shadow); }
+    .ending.show { display: block; }
+    .ending-icon { font-size: 31px; }
+    .ending h2 { margin-top: 6px; font-size: 25px; }
+    .ending p { margin: 8px 0 17px; color: var(--muted); font-size: 13px; }
+    .ending .primary { max-width: 240px; margin: 0 auto; }
+    footer { margin-top: 20px; color: #a19386; font-size: 11px; text-align: center; }
+    @media (max-width: 720px) {
+      .shell { padding: 22px 16px 36px; }
+      header { margin-bottom: 20px; }
+      .metrics { gap: 9px; }
+      .metric { padding: 14px 12px; }
+      .metric-value { font-size: 23px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .panel { padding: 19px; }
+    }
+    @media (max-width: 440px) {
+      .brand-mark { width: 41px; height: 41px; }
+      .day-pill { padding: 8px 10px; font-size: 11px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:last-child { grid-column: 1 / -1; }
+      .log-row { grid-template-columns: 48px 1fr 78px; gap: 6px; }
+      .log-row .log-money { display: none; }
+      .log-row > :last-child { grid-column: 3; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🍪</div>
+        <div><p class="eyebrow">A little shop, a big dream</p><h1>Mich's Cookie Shop Tycoon</h1></div>
+      </div>
+      <div class="day-pill" id="day-pill">Day 1 of 30</div>
+    </header>
+    <div class="progress-track" aria-label="Game progress"><div class="progress-fill" id="progress-fill"></div></div>
+    <section class="metrics" aria-label="Shop status">
+      <div class="metric"><div class="metric-label">Cash on hand</div><div class="metric-value" id="cash-value">$100.00</div><div class="metric-note">Your working capital</div></div>
+      <div class="metric"><div class="metric-label">Shop reputation</div><div class="metric-value" id="rep-value">⭐ 50</div><div class="metric-note">Happy customers bring friends</div></div>
+      <div class="metric"><div class="metric-label">Total profit</div><div class="metric-value" id="profit-value">$0.00</div><div class="metric-note">Across your first 0 days</div></div>
+    </section>
+    <div class="main-grid">
+      <section class="panel">
+        <div class="panel-head"><div><h2>Plan today's bake</h2><p class="sub">Find the sweet spot between what you make and what folks will buy.</p></div></div>
+        <div class="shop-scene" id="shop-scene" role="group" aria-label="Cookie shop and today's customers">
+          <div class="scene-sun"></div><div class="scene-cloud" aria-hidden="true">☁</div>
+          <div class="scene-caption" id="scene-caption" role="status" aria-live="polite">Ready for the morning rush</div>
+          <div class="storefront" aria-hidden="true"><div class="shop-sign">Mich's Cookies</div><div class="shop-awning"></div><div class="shop-window"></div><div class="shop-door"></div></div>
+          <div class="scene-ground" aria-hidden="true"></div><div id="customer-lane" aria-hidden="true"></div><div id="cookie-lane" aria-hidden="true"></div>
+        </div>
+        <div class="section-label" style="margin-top:0"><span>Choose a cookie variety</span><span class="hint">Set your own price each day</span></div>
+        <div class="variety-grid" id="variety-grid" role="group" aria-label="Cookie variety">
+          <button class="variety-option" type="button" data-variety="classic" aria-pressed="true"><span class="variety-icon" aria-hidden="true">🍪</span><span class="variety-copy"><span class="variety-name">Classic chip</span><span class="variety-economics">Cost $0.40 · Price $2.00</span></span></button>
+          <button class="variety-option" type="button" data-variety="double" aria-pressed="false"><span class="variety-icon" aria-hidden="true">🍫</span><span class="variety-copy"><span class="variety-name">Double chocolate</span><span class="variety-economics">Cost $0.55 · Price $2.60</span></span></button>
+          <button class="variety-option" type="button" data-variety="oat" aria-pressed="false"><span class="variety-icon" aria-hidden="true">🌾</span><span class="variety-copy"><span class="variety-name">Honey oat</span><span class="variety-economics">Cost $0.45 · Price $2.25</span></span></button>
+          <button class="variety-option" type="button" data-variety="confetti" aria-pressed="false"><span class="variety-icon" aria-hidden="true">🎉</span><span class="variety-copy"><span class="variety-name">Confetti crunch</span><span class="variety-economics">Cost $0.50 · Price $2.40</span></span></button>
+        </div>
+        <div class="section-label"><label for="bake-range">Cookies to bake</label><span class="hint" id="ingredient-hint">Ingredients: $0.40 each</span></div>
+        <div class="input-row"><input id="bake-range" type="range" min="0" max="250" step="5" value="60" aria-label="Cookies to bake"><div class="number-wrap"><input id="bake-input" type="number" min="0" max="250" step="5" value="60" aria-label="Number of cookies"><span class="unit">cookies</span></div></div>
+        <div class="range-ends"><span>0</span><span>250 cookies</span></div>
+        <div class="section-label"><label for="price-range">Price per cookie</label><span class="hint">Customers love a fair price</span></div>
+        <div class="input-row"><input id="price-range" type="range" min="0.5" max="5" step="0.05" value="2" aria-label="Price per cookie"><div class="number-wrap"><span class="unit">$</span><input id="price-input" type="number" min="0.5" max="5" step="0.05" value="2.00" aria-label="Price per cookie in dollars"></div></div>
+        <div class="range-ends"><span>$0.50</span><span>$5.00</span></div>
+        <div class="section-label"><label for="ad-range">Today's advertising</label><span class="hint">More buzz, more visitors</span></div>
+        <div class="input-row"><input id="ad-range" type="range" min="0" max="60" step="5" value="10" aria-label="Advertising budget"><div class="number-wrap"><span class="unit">$</span><input id="ad-input" type="number" min="0" max="60" step="5" value="10" aria-label="Advertising budget in dollars"></div></div>
+        <div class="range-ends"><span>$0</span><span>$60</span></div>
+        <div class="cost-box" aria-live="polite">
+          <div class="cost-row"><span>Baking costs</span><strong id="bake-cost">$24.00</strong></div>
+          <div class="cost-row"><span>Advertising</span><strong id="ad-cost">$10.00</strong></div>
+          <div class="cost-row total"><span>Cash needed today</span><strong id="total-cost">$34.00</strong></div>
+        </div>
+        <p class="notice" id="notice" role="status"></p>
+        <button class="primary" id="open-button">Open the shop <span aria-hidden="true">→</span></button>
+        <div class="results" id="results" aria-live="polite"></div>
+      </section>
+      <aside class="panel">
+        <div class="panel-head"><div><h2>Today's outlook</h2><p class="sub">A little read on the neighborhood.</p></div></div>
+        <div class="market-card"><div class="market-title"><span class="market-dot"></span><span id="market-title">A fresh start</span></div><p class="market-copy" id="market-copy">The ovens are warm and the neighborhood is waking up. A good day to make your first batch.</p></div>
+        <div class="section-label" style="margin-top:20px">How the shop works</div>
+        <p class="sub" style="margin:0 0 12px">Each morning, decide what to bake, set your price, and choose an ad budget. Customers respond to your price, your reputation, and a bit of daily luck.</p>
+        <p class="sub" style="margin:0">Every variety has its own ingredient cost and suggested price; adjust the selling price to suit your customers. Unsold cookies are wasted at closing, so plan with care. You have <strong style="color:var(--ink)">30 days</strong> to grow the shop.</p>
+      </aside>
+    </div>
+    <div class="ending" id="ending" aria-live="polite"></div>
+    <section class="panel log-panel">
+      <div class="log-head"><h2>Daily ledger</h2><span class="hint" id="ledger-count">No days played yet</span></div>
+      <div class="log-scroll" id="log-scroll"><div class="log-empty" id="log-empty">Your first day's numbers will appear here when the shop closes.</div><div id="log-rows"></div></div>
+    </section>
+    <footer>Made with butter, sugar & a little business sense.</footer>
+  </main>
+  <script>
+    (() => {
+      const DAYS = 30;
+      const varieties = {
+        classic: { name: 'Classic chip', icon: '🍪', cost: 0.40, price: 2.00 },
+        double: { name: 'Double chocolate', icon: '🍫', cost: 0.55, price: 2.60 },
+        oat: { name: 'Honey oat', icon: '🌾', cost: 0.45, price: 2.25 },
+        confetti: { name: 'Confetti crunch', icon: '🎉', cost: 0.50, price: 2.40 }
+      };
+      const markets = [
+        { title: 'A fresh start', copy: 'The ovens are warm and the neighborhood is waking up. A good day to make your first batch.' },
+        { title: 'Rainy day comfort', copy: 'A little drizzle has folks craving something warm and sweet. Demand is up today.' },
+        { title: 'Market day crowds', copy: 'The street market brought a crowd into the neighborhood. Plenty of curious cookie fans around.' },
+        { title: 'A quiet afternoon', copy: 'It is a slower day on the block. Regulars will still stop by, but walk-ins may be fewer.' },
+        { title: 'Sweet tooth season', copy: 'Word is spreading about your shop. Customers are in the mood for a treat.' },
+        { title: 'New shop on the block', copy: 'A competitor opened nearby today. Give customers a reason to choose your cookies.' },
+        { title: 'Weekend wanderers', copy: 'More families are out and about. The sidewalk is lively and the smell of cookies travels far.' },
+        { title: 'A little buzz', copy: 'Someone mentioned your shop around town. Good cookies and a little buzz can go a long way.' }
+      ];
+      const $ = id => document.getElementById(id);
+      const state = { day: 1, cash: 100, reputation: 50, totalProfit: 0, history: [], lastResult: null, variety: 'classic' };
+      const inputs = {
+        bake: { range: $('bake-range'), number: $('bake-input'), min: 0, max: 250, step: 5, integer: true },
+        price: { range: $('price-range'), number: $('price-input'), min: 0.5, max: 5, step: 0.05, integer: false },
+        ad: { range: $('ad-range'), number: $('ad-input'), min: 0, max: 60, step: 5, integer: true }
+      };
+      const money = value => '$' + value.toFixed(2);
+      function bindPair(pair, key) {
+        const parse = raw => {
+          const n = Number(raw);
+          if (!Number.isFinite(n)) return Number(pair.range.value);
+          const clamped = Math.min(pair.max, Math.max(pair.min, n));
+          return pair.integer ? Math.round(clamped / pair.step) * pair.step : Math.round(clamped / pair.step) * pair.step;
+        };
+        const update = (source, commit) => {
+          const value = parse(source.value);
+          pair.range.value = String(value);
+          pair.number.value = key === 'price' ? value.toFixed(2) : String(value);
+          refreshCosts();
+        };
+        pair.range.addEventListener('input', () => update(pair.range, false));
+        pair.number.addEventListener('input', () => {
+          if (pair.number.value !== '') {
+            const n = Number(pair.number.value);
+            if (Number.isFinite(n)) { pair.range.value = String(parse(n)); refreshCosts(); }
+          }
+        });
+        pair.number.addEventListener('change', () => update(pair.number, true));
+        pair.number.addEventListener('blur', () => update(pair.number, true));
+      }
+      Object.entries(inputs).forEach(([key, pair]) => bindPair(pair, key));
+      function selected() { return { bake: Number(inputs.bake.range.value), price: Number(inputs.price.range.value), ad: Number(inputs.ad.range.value), variety: varieties[state.variety] }; }
+      function refreshCosts() {
+        const pick = selected(), baking = pick.bake * pick.variety.cost, needed = baking + pick.ad;
+        $('bake-cost').textContent = money(baking); $('ad-cost').textContent = money(pick.ad); $('total-cost').textContent = money(needed);
+        $('ingredient-hint').textContent = `Ingredients: ${money(pick.variety.cost)} each`;
+        const insufficient = needed > state.cash + 1e-7;
+        $('notice').textContent = insufficient ? `You need ${money(needed - state.cash)} more to afford this plan.` : '';
+        $('open-button').disabled = insufficient || state.day > DAYS;
+      }
+      function updateTop() {
+        $('day-pill').textContent = state.day <= DAYS ? `Day ${state.day} of ${DAYS}` : 'Season complete';
+        $('progress-fill').style.width = `${Math.min(100, (state.day - 1) / DAYS * 100)}%`;
+        $('cash-value').textContent = money(state.cash); $('rep-value').textContent = `⭐ ${state.reputation}`;
+        $('profit-value').textContent = money(state.totalProfit);
+        $('profit-value').className = `metric-value ${state.totalProfit >= 0 ? 'positive' : 'negative'}`;
+        $('ledger-count').textContent = state.history.length ? `${state.history.length} of ${DAYS} days` : 'No days played yet';
+      }
+      function chooseVariety(key) {
+        if (!varieties[key]) return;
+        state.variety = key;
+        document.querySelectorAll('.variety-option').forEach(button => {
+          button.setAttribute('aria-pressed', String(button.dataset.variety === key));
+        });
+        const price = varieties[key].price;
+        inputs.price.range.value = String(price);
+        inputs.price.number.value = price.toFixed(2);
+        refreshCosts();
+      }
+      function showMarket() {
+        const item = state.day === 1 ? markets[0] : markets[1 + Math.floor(Math.random() * (markets.length - 1))];
+        $('market-title').textContent = item.title; $('market-copy').textContent = item.copy;
+      }
+      function showResult(r) {
+        const el = $('results'); el.classList.add('show');
+        const profitClass = r.profit >= 0 ? 'positive' : 'negative';
+        el.innerHTML = `<h3>Day ${r.day} · ${r.variety.name} is in the books</h3><div class="result-grid">
+          <div class="result-item"><span>Cookies sold</span><strong>${r.sold} of ${r.baked}</strong></div>
+          <div class="result-item"><span>Revenue</span><strong>${money(r.revenue)}</strong></div>
+          <div class="result-item"><span>Expenses</span><strong>${money(r.expenses)}</strong></div>
+          <div class="result-item"><span>Profit today</span><strong class="${profitClass}">${r.profit < 0 ? '−' : ''}${money(Math.abs(r.profit))}</strong></div>
+          <div class="result-item"><span>Cookies left over</span><strong>${r.baked - r.sold}</strong></div>
+          <div class="result-item"><span>Cash remaining</span><strong>${money(state.cash)}</strong></div>
+        </div>`;
+      }
+      function animateCustomers(r) {
+        const people = ['🧑🏻', '🧑🏽', '🧒🏼', '👵🏽', '👨🏻', '🧑🏿', '👩🏼', '🧔🏾'];
+        const customerLane = $('customer-lane'), cookieLane = $('cookie-lane');
+        customerLane.replaceChildren(); cookieLane.replaceChildren();
+        if (r.sold === 0) {
+          $('scene-caption').textContent = r.baked === 0 ? 'The shop is closed today' : 'A quiet day. Your cookies are waiting!';
+          return;
+        }
+        // Most shoppers take home one or two cookies; group busy-day visitors into animated bundles.
+        const buyers = Math.ceil(r.sold / 1.8);
+        const visibleGroups = Math.min(8, buyers);
+        $('scene-caption').textContent = `${buyers} ${buyers === 1 ? 'customer' : 'customers'} stopped by · ${r.sold} cookies sold!`;
+        const customersPerGroup = Math.floor(buyers / visibleGroups);
+        const extraCustomers = buyers % visibleGroups;
+        for (let i = 0; i < visibleGroups; i++) {
+          const represented = customersPerGroup + (i < extraCustomers ? 1 : 0);
+          const customer = document.createElement('span');
+          customer.className = `customer customer-arriving arrival-${i + 1}`;
+          customer.textContent = people[(i + r.day) % people.length];
+          if (represented > 1) {
+            const badge = document.createElement('span');
+            badge.className = 'customer-badge';
+            badge.textContent = `×${represented}`;
+            customer.append(badge);
+          }
+          customerLane.append(customer);
+          const cookie = document.createElement('span');
+          cookie.className = `cookie-pop playing arrival-${i + 1}`;
+          cookie.textContent = '🍪';
+          cookieLane.append(cookie);
+        }
+      }
+      function addLog(r) {
+        $('log-empty').style.display = 'none';
+        const row = document.createElement('div'); row.className = 'log-row';
+        const profitClass = r.profit >= 0 ? 'positive' : 'negative';
+        row.innerHTML = `<span class="log-day">Day ${r.day}</span><span class="log-detail">${r.variety.icon} ${r.variety.name} · ${r.sold} sold · ${r.baked - r.sold} left · ${money(r.price)} each</span><span class="log-money">${money(r.revenue)} revenue</span><span class="log-profit ${profitClass}">${r.profit < 0 ? '−' : '+'}${money(Math.abs(r.profit))}</span>`;
+        $('log-rows').prepend(row);
+      }
+      function runDay() {
+        const p = selected(), bakingCost = p.bake * p.variety.cost, expenses = bakingCost + p.ad;
+        if (expenses > state.cash + 1e-7) return;
+        const day = state.day;
+        const demandNoise = 0.82 + Math.random() * 0.36;
+        const priceFactor = Math.max(0.22, 1.42 - p.price * 0.19);
+        const adFactor = 1 + Math.log1p(p.ad) * 0.19;
+        const reputationFactor = 0.65 + state.reputation / 100;
+        const baseDemand = 31 + day * 1.15;
+        const demand = Math.max(0, Math.round(baseDemand * priceFactor * adFactor * reputationFactor * demandNoise));
+        const sold = Math.min(p.bake, demand), revenue = sold * p.price, profit = revenue - expenses;
+        state.cash = Math.round((state.cash + profit) * 100) / 100;
+        state.totalProfit = Math.round((state.totalProfit + profit) * 100) / 100;
+        const satisfaction = p.bake === 0 ? -2 : sold === 0 ? -5 : sold === p.bake && demand > p.bake ? 1.5 : sold < p.bake * 0.55 ? -2 : 1;
+        const valueScore = p.price <= 1.5 ? 1 : p.price >= 3.5 ? -1 : 0;
+        state.reputation = Math.max(0, Math.min(100, Math.round(state.reputation + satisfaction + valueScore)));
+        const result = { day, baked: p.bake, sold, price: p.price, variety: p.variety, revenue, expenses, profit };
+        state.history.push(result); addLog(result); showResult(result);
+        animateCustomers(result);
+        state.day++;
+        updateTop();
+        if (state.day > DAYS) finishSeason();
+        else { $('open-button').innerHTML = 'Open the shop <span aria-hidden="true">→</span>'; showMarket(); }
+        refreshCosts();
+      }
+      function finishSeason() {
+        $('progress-fill').style.width = '100%';
+        const gain = state.cash - 100;
+        const heading = gain >= 500 ? 'A neighborhood favorite!' : gain > 0 ? 'A sweet little success!' : gain === 0 ? 'Thirty days in the books.' : 'Every shop has a slow season.';
+        $('ending').innerHTML = `<div class="ending-icon">${gain >= 0 ? '🏆' : '🍪'}</div><h2>${heading}</h2><p>After 30 days, you finished with <strong>${money(state.cash)}</strong> in cash and <strong class="${state.totalProfit >= 0 ? 'positive' : 'negative'}">${state.totalProfit < 0 ? '−' : ''}${money(Math.abs(state.totalProfit))}</strong> total profit.</p><button class="primary" id="restart-button">Start a new season <span aria-hidden="true">↻</span></button>`;
+        $('ending').classList.add('show'); $('open-button').disabled = true;
+        $('open-button').innerHTML = 'Season complete';
+        $('restart-button').addEventListener('click', restart);
+      }
+      function restart() {
+        state.day = 1; state.cash = 100; state.reputation = 50; state.totalProfit = 0; state.history = [];
+        $('log-rows').replaceChildren(); $('log-empty').style.display = 'block'; $('ending').classList.remove('show'); $('results').classList.remove('show');
+        $('bake-range').value = 60; $('bake-input').value = 60; $('price-range').value = varieties.classic.price; $('price-input').value = varieties.classic.price.toFixed(2); $('ad-range').value = 10; $('ad-input').value = 10;
+        chooseVariety('classic');
+        updateTop(); showMarket(); refreshCosts(); $('open-button').innerHTML = 'Open the shop <span aria-hidden="true">→</span>';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      $('variety-grid').addEventListener('click', event => {
+        const button = event.target.closest('[data-variety]');
+        if (button) chooseVariety(button.dataset.variety);
+      });
+      $('open-button').addEventListener('click', runDay);
+      updateTop(); showMarket(); refreshCosts();
+    })();
+  </script>
+</body>
+</html>
